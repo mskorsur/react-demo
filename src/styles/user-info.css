@@ -1,0 +1,74 @@
+.user {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-info__wrapper {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.user-info {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.user-info__avatar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.user-info__avatar-icon {
+    width: 100px !important;
+    height: 100px !important;
+}
+
+.user-info__contact {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    font-size: 14px;
+}
+
+.user-posts__wrapper {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.user-posts {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-form__wrapper {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.user-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.user-form__buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.user-form__buttons__button {
+    margin-right: 15px !important;
+}
