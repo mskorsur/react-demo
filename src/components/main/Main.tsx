@@ -5,37 +5,36 @@ import CardContent from '@material-ui/core/CardContent';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import PersonIcon from '@material-ui/icons/Person';
-import MessageIcon from '@material-ui/icons/Message';
-import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import '../../styles/user-info.css';
 import { IUser, IPost } from '../../typings';
 import { UserService } from '../../services/UserService';
+import { UserPost } from '../user/index'; 
+import { UserForm } from '../user/index';
+import { NEW_DISPLAY_TYPE, EDIT_DISPLAY_TYPE, DEFAULT_DISPLAY_TYPE } from '../../constants/FormDisplayType';
 
 interface Props {
     classes: string;
     user?: IUser;
+    switchMessagePopup: (shouldDisplay: boolean) => void
+    toggleUserForm: (type: string) => void;
+    formDisplayType: string;
 }
 
 interface State {
-    isEditingUser: boolean;
     userPosts: IPost[];
+    postsToDelete: IPost[];
 }
 
 export class Main extends React.Component<Props, State> {
     state = {
-        isEditingUser: false,
         userPosts: [] as IPost[],
+        postsToDelete: [] as IPost[]
     };
 
     async componentDidUpdate(prevProps: Readonly<Props>) {
@@ -54,7 +53,7 @@ export class Main extends React.Component<Props, State> {
     }
 
     renderUserInformation = () => {
-        if (this.props.user === undefined) {
+        if (this.props.user === undefined || this.props.formDisplayType === NEW_DISPLAY_TYPE) {
             return null;
         }
 
@@ -80,8 +79,8 @@ export class Main extends React.Component<Props, State> {
                             {this.props.user.website}
                         </Typography>
                     </div>
-                    {!this.state.isEditingUser && (
-                        <IconButton aria-label="delete" onClick={this.toggleEditingUser}>
+                    {this.props.formDisplayType === DEFAULT_DISPLAY_TYPE && (
+                        <IconButton aria-label="delete" onClick={() => {this.props.toggleUserForm(EDIT_DISPLAY_TYPE)}}>
                             <EditIcon fontSize="large" />
                         </IconButton>
                     )}
@@ -91,37 +90,24 @@ export class Main extends React.Component<Props, State> {
     }
 
     renderUserBody = () => {
-        if (this.state.isEditingUser) {
-            return this.renderUserForm();
-        }
-        else {
-            return this.renderUserPosts();
+        switch(this.props.formDisplayType) {
+            case EDIT_DISPLAY_TYPE:
+                return this.renderUserForm();
+            case NEW_DISPLAY_TYPE:
+                return this.renderCreateUserForm();
+            case DEFAULT_DISPLAY_TYPE:
+                return this.renderUserPosts();
         }
     }
 
     renderUserForm = () => {
         return (
-            <Card className={'user-form__wrapper'}>
-                <CardContent className="user-form">
-                    <Typography variant="h5" component="h2">
-                            Edit agent information
-                    </Typography>
-                    <form className="user-form">
-                        <TextField margin={'normal'} fullWidth id="name" label="Name" variant="outlined" />
-                        <TextField margin={'normal'} fullWidth id="email" label="Email" variant="outlined" />
-                        <TextField margin={'normal'} fullWidth id="phone" label="Phone" variant="outlined" />
-                        <TextField margin={'normal'} fullWidth id="website" label="Website" variant="outlined" />
-                        <div className="user-form__buttons">
-                            <Button className="user-form__buttons__button" variant="contained" color="primary">
-                                Save
-                            </Button>
-                            <Button className="user-form__buttons__button" variant="contained" onClick={this.toggleEditingUser}>
-                                Cancel
-                            </Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
+           <UserForm 
+                toggleEditingUser = {this.props.toggleUserForm}
+                user = {this.props.user}
+                switchMessagePopup = {this.props.switchMessagePopup}
+                isNew = {this.props.formDisplayType === NEW_DISPLAY_TYPE ? true : false}
+           />
         );
     }
 
@@ -131,30 +117,35 @@ export class Main extends React.Component<Props, State> {
             <Card className={'user-posts__wrapper'}>
                 <CardContent className="user-posts">
                     <List>
+                    {this.renderTrashCan(numOfPosts)}
                         {this.state.userPosts.map((post, index) => {
                             return (
-                                <React.Fragment key={post.id}>
-                                    <ListItem>
-                                        <ListItemAvatar>
-                                            <Avatar>
-                                                <MessageIcon />
-                                            </Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText primary={post.title} secondary={post.body} />
-                                        <ListItemSecondaryAction>
-                                            <IconButton edge="end" aria-label="delete">
-                                                <DeleteIcon />
-                                            </IconButton>
-                                        </ListItemSecondaryAction>
-                                    </ListItem>
-                                    {this.renderPostDivider(numOfPosts, index)}
-                                </React.Fragment>
+                                <UserPost 
+                                    key = {post.id}
+                                    post={post}
+                                    index={index}
+                                    numOfPosts = {numOfPosts}
+                                    removeUserPost = {this.removeUserPost}
+                                    changePostsForDelete = {this.changePostsForDelete}
+                                    switchMessagePopup = {this.props.switchMessagePopup}
+                                />
                             );
                         })}
                     </List>
                 </CardContent>
             </Card>
         );
+    }
+
+    renderCreateUserForm = () => {
+        return (
+            <UserForm 
+                 toggleEditingUser = {this.props.toggleUserForm}
+                 user = {undefined}
+                 switchMessagePopup = {this.props.switchMessagePopup}
+                 isNew = {this.props.formDisplayType === NEW_DISPLAY_TYPE ? true : false}
+            />
+         );
     }
 
     renderPostDivider = (numOfPosts: number, postIndex: number) => {
@@ -165,14 +156,56 @@ export class Main extends React.Component<Props, State> {
         return <Divider />;
     }
 
-    toggleEditingUser = () => {
-        this.setState((prevState: State) => ({
-            isEditingUser: !prevState.isEditingUser,
-        }));
+    renderTrashCan = (numOfPosts: number) => {
+        if(numOfPosts > 0){
+            return (<IconButton onClick={this.deleteCheckedPosts} edge="end" aria-label="delete">
+                        <DeleteIcon />
+                    </IconButton>);
+        }
     }
 
     getUserPosts = async () => {
         const posts = await UserService.getUserPosts(this.props.user!.id);
         this.setState({ userPosts: posts });
+    }
+
+
+    removeUserPost = (postId: number) => {
+        let userPosts = this.state.userPosts.filter((post) => post.id !== postId);
+        this.setState({userPosts});
+    }
+
+    changePostsForDelete = (post : IPost, toDelete: boolean) => {
+        let newPostsForDelete = new Array<IPost>();
+        if(toDelete) {
+            newPostsForDelete = [...this.state.postsToDelete, post];
+        }
+        else {
+            newPostsForDelete = [...this.state.postsToDelete.filter((currentPost) => currentPost.id !== post.id)]
+        }
+        this.setState({
+            postsToDelete: [...newPostsForDelete]
+        });
+    }
+
+     deleteCheckedPosts = async () => {
+        let deleteActions = new Array<Promise<IPost[]>>();
+        this.state.postsToDelete.forEach((post) => {
+            deleteActions.push(UserService.deleteUserPost(post.id));
+        });
+
+        try {
+            await Promise.all(deleteActions);
+            let newUserPosts = [...this.state.userPosts];
+            this.state.postsToDelete.forEach((postToDelete) => {
+                newUserPosts = newUserPosts.filter((post) => post.id !== postToDelete.id);
+            })
+            this.setState({
+                userPosts: [...newUserPosts]
+            })
+        }
+        catch(error) {
+            this.props.switchMessagePopup(true);
+        }
     }
 }

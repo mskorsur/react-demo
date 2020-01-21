@@ -9,14 +9,17 @@ import PersonIcon from '@material-ui/icons/Person';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 
 import { IUser } from '../../typings';
+import { NEW_DISPLAY_TYPE } from '../../constants/FormDisplayType';
 
 interface Props {
     classes: string;
     users: IUser[];
     selectedUserId: number;
     onUserSelect: (userId: number) => void;
+    toggleUserForm: (type: string) => void;
 }
 
 interface State {
@@ -36,6 +39,7 @@ export class Sidebar extends React.Component<Props, State> {
                         id="user-search"
                         label="Search agents"
                         value={this.state.searchTerm}
+                        onChange={this.onInputChange}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -47,6 +51,7 @@ export class Sidebar extends React.Component<Props, State> {
                     <List component="nav" aria-label="users">
                         {this.renderUsers()}
                     </List>
+                    <Button variant="contained" color="primary" onClick={() => {this.props.toggleUserForm(NEW_DISPLAY_TYPE)}} >Add user</Button>
                 </Paper>
             </Grid>
         );
@@ -54,19 +59,27 @@ export class Sidebar extends React.Component<Props, State> {
 
     renderUsers = () => {
         return this.props.users.map((user: IUser) => {
-            return (
-                <ListItem 
-                    key={user.id} 
-                    button
-                    selected={this.props.selectedUserId === user.id}
-                    onClick={() => { this.props.onUserSelect(user.id) }}
-                >
-                    <ListItemIcon>
-                        <PersonIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={user.name} />
-                </ListItem>
-            );
+            if (user.name.indexOf(this.state.searchTerm) > -1){
+                return (
+                    <ListItem 
+                        key={user.id} 
+                        button
+                        selected={this.props.selectedUserId === user.id}
+                        onClick={() => { this.props.onUserSelect(user.id) }}
+                    >
+                        <ListItemIcon>
+                            <PersonIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={user.name} />
+                    </ListItem>
+                );
+            }
         });
+    }
+
+    onInputChange = (event: Object): void => {
+        let eventObject = event as Event;
+        let target = eventObject.target! as HTMLInputElement;
+        this.setState({searchTerm: target.value})
     }
 }
