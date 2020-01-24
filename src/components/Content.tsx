@@ -22,7 +22,7 @@ interface State {
 export class Content extends React.Component<Props, State> {
     state = {
         users: [] as IUser[],
-        selectedUserId: 0,
+        selectedUserId: 0,  //todo: selectedUserObject, pass this directly to main component
         openMessage: false,
         formDisplayType: DEFAULT_DISPLAY_TYPE
     }
