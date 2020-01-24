@@ -14,7 +14,7 @@ interface Props {
 
 interface State {
     users: IUser[];
-    selectedUserId: number;
+    selectedUser?: IUser;
     openMessage: boolean;
     formDisplayType: string;
 }
@@ -22,7 +22,7 @@ interface State {
 export class Content extends React.Component<Props, State> {
     state = {
         users: [] as IUser[],
-        selectedUserId: 0,  //todo: selectedUserObject, pass this directly to main component
+        selectedUser: undefined,
         openMessage: false,
         formDisplayType: DEFAULT_DISPLAY_TYPE
     }
@@ -38,13 +38,12 @@ export class Content extends React.Component<Props, State> {
                 <Sidebar
                     classes={this.props.classes}
                     users={this.state.users}
-                    selectedUserId={this.state.selectedUserId}
                     onUserSelect={this.handleUserSelect}
                     toggleUserForm = {this.toggleUserForm}
                 />
                 <Main 
                     classes={this.props.classes}
-                    user={this.state.users.find(user => user.id === this.state.selectedUserId )}
+                    user={this.state.selectedUser}
                     switchMessagePopup= {this.switchMessagePopup}
                     toggleUserForm = {this.toggleUserForm}
                     formDisplayType = {this.state.formDisplayType}
@@ -58,8 +57,8 @@ export class Content extends React.Component<Props, State> {
         );
     }
 
-    handleUserSelect = (userId: number) => {
-        this.setState({ selectedUserId: userId });
+    handleUserSelect = (user: IUser) => {
+        this.setState({ selectedUser: user });
     }
 
     switchMessagePopup = (shouldDisplay: boolean) => {

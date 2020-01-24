@@ -8,7 +8,8 @@ import { IUser } from '../../typings';
 
 interface Props {
     user: IUser,
-    onUserSelect : (user: IUser) => void
+    onUserSelect : (user: IUser) => void,
+    selectedUserId: number
 }
 
 interface State {
@@ -25,8 +26,8 @@ export class SidebarListItem extends React.Component<Props, State> {
             <ListItem 
                         key={this.props.user.id} 
                         button
-                        selected={this.state.selected}
-                        onClick={() => { this.props.onUserSelect(this.props.user) }}
+                        selected={this.props.selectedUserId === this.props.user.id}
+                        onClick={() => { this.onUserSelect() }}
                     >
                         <ListItemIcon>
                             <PersonIcon />
@@ -36,4 +37,10 @@ export class SidebarListItem extends React.Component<Props, State> {
         );
     }
 
+    onUserSelect = () => {
+        this.setState(prevState => ({
+            selected: !prevState.selected
+        }));
+        this.props.onUserSelect(this.props.user);
+    }
 }

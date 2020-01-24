@@ -16,7 +16,7 @@ import { IUser, IPost } from '../../typings';
 import { UserService } from '../../services/UserService';
 import { UserPost } from '../user/index'; 
 import { UserForm } from '../user/index';
-import { NEW_DISPLAY_TYPE, EDIT_DISPLAY_TYPE, DEFAULT_DISPLAY_TYPE } from '../../constants/FormDisplayType';
+import { DEFAULT_DISPLAY_TYPE, EDIT_DISPLAY_TYPE, NEW_DISPLAY_TYPE } from '../../constants/FormDisplayType';
 
 interface Props {
     classes: string;
@@ -165,8 +165,13 @@ export class Main extends React.Component<Props, State> {
     }
 
     getUserPosts = async () => {
-        const posts = await UserService.getUserPosts(this.props.user!.id);
-        this.setState({ userPosts: posts });
+        try{
+            const posts = await UserService.getUserPosts(this.props.user!.id);
+            this.setState({ userPosts: posts });
+        }
+        catch (error) {
+            this.props.switchMessagePopup(true);
+        }
     }
 
 
@@ -195,7 +200,7 @@ export class Main extends React.Component<Props, State> {
         });
 
         try {
-            await Promise.all(deleteActions);
+            await Promise.all(deleteActions); 
             let newUserPosts = [...this.state.userPosts];
             this.state.postsToDelete.forEach((postToDelete) => {
                 newUserPosts = newUserPosts.filter((post) => post.id !== postToDelete.id);
@@ -206,6 +211,9 @@ export class Main extends React.Component<Props, State> {
         }
         catch(error) {
             this.props.switchMessagePopup(true);
+            setTimeout(() => {            
+                window.location.reload();
+            }, 1500);
         }
     }
 }
