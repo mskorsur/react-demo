@@ -74,6 +74,7 @@ export class Sidebar extends React.Component<Props, State> {
                     />
                 );
             }
+            else return null;
         });
     }
 
