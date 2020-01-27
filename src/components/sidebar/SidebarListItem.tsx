@@ -12,22 +12,16 @@ interface Props {
     selectedUserId: number
 }
 
-interface State {
-    selected: boolean
-}
+interface State {}
 
 export class SidebarListItem extends React.Component<Props, State> {
-    state = {
-        selected: false
-    };
-
     render() {
         return (
             <ListItem 
                         key={this.props.user.id} 
                         button
                         selected={this.props.selectedUserId === this.props.user.id}
-                        onClick={() => { this.onUserSelect() }}
+                        onClick={this.onUserSelect}
                     >
                         <ListItemIcon>
                             <PersonIcon />
@@ -38,9 +32,6 @@ export class SidebarListItem extends React.Component<Props, State> {
     }
 
     onUserSelect = () => {
-        this.setState(prevState => ({
-            selected: !prevState.selected
-        }));
         this.props.onUserSelect(this.props.user);
     }
 }

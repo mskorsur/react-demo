@@ -2,11 +2,11 @@ import React, { ChangeEvent } from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import { IUser, IUserAddress, IUserCompany } from '../../typings';
+import { IUser } from '../../typings';
 import { UserService } from '../../services/UserService';
 import { DEFAULT_DISPLAY_TYPE } from '../../constants/FormDisplayType';
+import { UserFormTextField } from './index'
 
 interface Props {
     toggleEditingUser: (type: string) => void;
@@ -15,38 +15,56 @@ interface Props {
     isNew: boolean;
 }
 
-interface State {
-    userFormData: IUser
+interface State extends StateAdapter {
+    id : number,
+    name: string,
+    username: string,
+    email: string,
+    company: {
+        name: string,
+        catchPhrase: string,
+        bs: string,
+    },
+    phone: string,
+    website: string,
+    address: {
+        street: string,
+        suite: string,
+        city: string,
+        zipcode: string,
+    }
+}
+
+interface StateAdapter {
+    [key: string]: any
 }
 
 export class UserForm extends React.Component<Props, State> {
     state = {
-        userFormData: {
-            id: 0,
+        id: 0,
+        name: '',
+        username: '',
+        email: '',
+        company: {
             name: '',
-            username: '',
-            email: '',
-            company: {
-                name: '',
-                catchPhrase: '',
-                bs: '',
-            } as IUserCompany,
-            phone: '',
-            website: '',
-            address: {
-                street: '',
-                suite: '',
-                city: '',
-                zipcode: '',
-            } as IUserAddress
-        } as IUser
+            catchPhrase: '',
+            bs: '',
+        },
+        phone: '',
+        website: '',
+        address: {
+            street: '',
+            suite: '',
+            city: '',
+            zipcode: '',
+        }   
     }
 
     componentDidMount() {
         if(this.props.user) {
-            this.setState({
-                userFormData: {...this.props.user} as IUser
-            })
+            this.setState(
+                {...this.state, ...this.props.user}
+            )
         }
     }
 
@@ -57,13 +75,37 @@ export class UserForm extends React.Component<Props, State> {
                     <Typography variant="h5" component="h2">
                             {this.props.isNew ? 'Create new user' : 'Edit user information'}
                     </Typography>
-                    <form className="user-form" onSubmit={this.submitUserForm}>
-                        <TextField margin={'normal'} fullWidth id="name" label="Name" variant="outlined" value={this.state.userFormData.name} onChange={(e) => {this.onUserFormFieldChange(e, "name")}} />
-                        <TextField margin={'normal'} fullWidth id="email" label="Email" variant="outlined" value={this.state.userFormData.email} onChange={(e) => {this.onUserFormFieldChange(e, "email")}}/>
-                        <TextField margin={'normal'} fullWidth id="phone" label="Phone" variant="outlined" value={this.state.userFormData.phone} onChange={(e) => {this.onUserFormFieldChange(e, "phone")}}/>
-                        <TextField margin={'normal'} fullWidth id="website" label="Website" variant="outlined" value={this.state.userFormData.website} onChange={(e) => {this.onUserFormFieldChange(e, "website")}}/>
-                        <TextField margin={'normal'} fullWidth id="company" label="Company name" variant="outlined" value={this.state.userFormData.company.name} onChange={(e) => {this.onUserFormFieldChange(e, "company_name")}}/>
-                        <TextField margin={'normal'} fullWidth id="street" label="Street name" variant="outlined" value={this.state.userFormData.address.street} onChange={(e) => {this.onUserFormFieldChange(e, "address")}}/>
+                    <form className="user-form" onSubmit={this.submitUserForm}> 
+                        <UserFormTextField 
+                            value={this.state.name}
+                            name="name"
+                            label="Name"
+                            onUserFormFieldChange = {this.onUserFormFieldChange}
+                        />
+                        <UserFormTextField 
+                            value={this.state.username}
+                            name="username"
+                            label="Username"
+                            onUserFormFieldChange = {this.onUserFormFieldChange}
+                        />
+                        <UserFormTextField 
+                            value={this.state.email}
+                            name="email"
+                            label="Email"
+                            onUserFormFieldChange = {this.onUserFormFieldChange}
+                        />
+                        <UserFormTextField 
+                            value={this.state.phone}
+                            name="phone"
+                            label="Phone"
+                            onUserFormFieldChange = {this.onUserFormFieldChange}
+                        />
+                        <UserFormTextField 
+                            value={this.state.website}
+                            name="website"
+                            label="Website"
+                            onUserFormFieldChange = {this.onUserFormFieldChange}
+                        />
                         <div className="user-form__buttons">
                             <Button className="user-form__buttons__button" variant="contained" color="primary" type="submit">
                                 Save
@@ -78,40 +120,20 @@ export class UserForm extends React.Component<Props, State> {
         );
     }
 
-    onUserFormFieldChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, key: string) : void => {
-        let updatedUserFormData = {...this.state.userFormData} as IUser;
+    onUserFormFieldChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) : void => {
         let value = event.target.value;
+        let key = event.target.name;
 
-        switch (key) {
-            case 'name':
-                updatedUserFormData.name = value;
-                break;
-            case 'email':
-                updatedUserFormData.email = value;
-                break;
-            case 'phone':
-                updatedUserFormData.phone = value;
-                break;
-            case 'website':
-                updatedUserFormData.website = value;
-                break;
-            case 'company_name':
-                updatedUserFormData.company.name = value;
-                break;
-            case 'address':
-                updatedUserFormData.address.street = value;
-        }
-        this.setState({
-            userFormData: updatedUserFormData
-        })
+        this.setState(
+            {[key]: value}
+        )
     }
 
     submitUserForm = async (event: React.FormEvent<HTMLFormElement>) => {
-        //todo: it should implement second option for posting new user but there is no endpoint
         event.preventDefault();
-        let userId = this.props.user?.id ? this.props.user?.id : 0;
+        if (!this.props.user?.id) return; 
         try {
-            await UserService.updateUser(userId, this.state.userFormData);
+            await UserService.updateUser(this.props.user?.id, this.state);
             this.props.toggleEditingUser(DEFAULT_DISPLAY_TYPE);
         }
         catch (error) {

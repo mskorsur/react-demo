@@ -4,7 +4,6 @@ import Snackbar from '@material-ui/core/Snackbar';
 
 import { Main, Sidebar } from './index';
 import { IUser } from '../typings';
-import { UserService } from '../services/UserService';
 import { Alert } from './Alert'
 import { DEFAULT_DISPLAY_TYPE } from '../constants/FormDisplayType';
 
@@ -13,7 +12,6 @@ interface Props {
 }
 
 interface State {
-    users: IUser[];
     selectedUser?: IUser;
     openMessage: boolean;
     formDisplayType: string;
@@ -21,23 +19,16 @@ interface State {
 
 export class Content extends React.Component<Props, State> {
     state = {
-        users: [] as IUser[],
         selectedUser: undefined,
         openMessage: false,
         formDisplayType: DEFAULT_DISPLAY_TYPE
     }
-
-    async componentDidMount() {
-        const users = await UserService.getUsers();
-        this.setState({ users });
-    }
-
+    
     render() {
         return (
             <Grid container spacing={3}>
                 <Sidebar
                     classes={this.props.classes}
-                    users={this.state.users}
                     onUserSelect={this.handleUserSelect}
                     toggleUserForm = {this.toggleUserForm}
                 />
