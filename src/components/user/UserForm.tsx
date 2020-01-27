@@ -131,14 +131,14 @@ export class UserForm extends React.Component<Props, State> {
 
     submitUserForm = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (!this.props.user?.id) return; 
+        let userId = this.props.user?.id ? this.props.user?.id : 0;
         try {
-            await UserService.updateUser(this.props.user?.id, this.state);
-            this.props.toggleEditingUser(DEFAULT_DISPLAY_TYPE);
+            await UserService.updateUser(userId, this.state);
         }
         catch (error) {
             this.props.switchMessagePopup(true);
-        } 
+        }
+        this.props.toggleEditingUser(DEFAULT_DISPLAY_TYPE);
     }
 
     onCancelFormClick = () => {
