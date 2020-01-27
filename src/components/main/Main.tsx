@@ -14,39 +14,37 @@ interface Props {
     formDisplayType: string;
 }
 
-export class Main extends React.Component<Props, {}> {
+export function Main (props: Props) {
     
-    render() {
-        return (
-            <Grid item xs={12} md={9} className="user">
-                {this.renderUserInformation()}
-                {this.renderUserBody()}
-            </Grid>
-        );
-    }
-
-    renderUserInformation = () => {
-        if (this.props.user === undefined || this.props.formDisplayType === NEW_DISPLAY_TYPE) {
+    const renderUserInformation = () => {
+        if (props.user === undefined || props.formDisplayType === NEW_DISPLAY_TYPE) {
             return null;
         }
         return (
             <UserInformation
-                user = {this.props.user}
-                formDisplayType= {this.props.formDisplayType}
-                toggleUserForm = {this.props.toggleUserForm}
+                user = {props.user}
+                formDisplayType= {props.formDisplayType}
+                toggleUserForm = {props.toggleUserForm}
             />
         );
     }
 
-    renderUserBody = () => {
-        return userDisplayMapping[this.props.formDisplayType](
+    const renderUserBody = () => {
+        return userDisplayMapping[props.formDisplayType](
         {
-            toggleEditingUser : this.props.toggleUserForm,
-            user : this.props.user,
-            switchMessagePopup : this.props.switchMessagePopup,
-            isNew : this.props.formDisplayType === NEW_DISPLAY_TYPE ? true : false,
-            toggleUserForm : this.props.toggleUserForm
+            toggleEditingUser : props.toggleUserForm,
+            user : props.user,
+            switchMessagePopup : props.switchMessagePopup,
+            isNew : props.formDisplayType === NEW_DISPLAY_TYPE ? true : false,
+            toggleUserForm : props.toggleUserForm
         } as IMapperProps
         );
     }
+
+    return (
+            <Grid item xs={12} md={9} className="user">
+                {renderUserInformation()}
+                {renderUserBody()}
+            </Grid>
+    );    
 }
