@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ChangeEvent} from 'react';
 import { IPost } from '../../typings';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
@@ -22,58 +22,51 @@ interface Props {
     switchMessagePopup: (shouldDisplay: boolean) => void
 }
 
-interface State {
-}
+export function UserPost (props: Props) {
 
-export class UserPost extends React.Component<Props, State> {
-    state = {}
-
-    render() {
-        return (
-            <React.Fragment key={this.props.post.id}>
+    return (
+            <React.Fragment key={props.post.id}>
                 <ListItem>
                     <ListItemAvatar>
                         <Avatar>
                             <MessageIcon />
                         </Avatar>
                     </ListItemAvatar>
-                    <ListItemText primary={this.props.post.title} secondary={this.props.post.body} />
+                    <ListItemText primary={props.post.title} secondary={props.post.body} />
                     <ListItemSecondaryAction>
                         <Checkbox 
-                            onChange = {this.markPostToDelete}
+                            onChange = {markPostToDelete}
                         />
-                        <IconButton onClick={this.deleteCard} edge="end" aria-label="delete">
+                        <IconButton onClick={deleteCard} edge="end" aria-label="delete">
                             <DeleteIcon />
                         </IconButton>
                     </ListItemSecondaryAction>
                 </ListItem>
-                {this.renderPostDivider(this.props.numOfPosts, this.props.index)}
+                {renderPostDivider(props.numOfPosts, props.index)}
             </React.Fragment>
-        );
-    }
+    );
+    
 
-    renderPostDivider = (numOfPosts: number, postIndex: number) => {
+    function renderPostDivider (numOfPosts: number, postIndex: number) {
         if ((numOfPosts - 1) === postIndex) {
             return null;
         }
 
         return <Divider />;
     }
-
-    deleteCard = async () => {
+ 
+    async function deleteCard () {
         try {
-            await UserService.deleteUserPost(this.props.post.id);
-            this.props.removeUserPost(this.props.post.id);
+            await UserService.deleteUserPost(props.post.id);
+            props.removeUserPost(props.post.id);
         }
         catch(error) {
-            this.props.switchMessagePopup(true)
+            props.switchMessagePopup(true)
         }
     }
 
-    markPostToDelete = (event: Object): void => {
-        let evt = event as Event;
-        let target = evt.target! as HTMLInputElement;
-        this.props.changePostsForDelete(this.props.post, target.checked);
+    function markPostToDelete (event: ChangeEvent<HTMLInputElement>) {
+        props.changePostsForDelete(props.post, event.target.checked);
     }
 
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
@@ -78,10 +78,8 @@ export class Sidebar extends React.Component<Props, State> {
         });
     }
 
-    onInputChange = (event: Object): void => {
-        let eventObject = event as Event;
-        let target = eventObject.target! as HTMLInputElement;
-        this.setState({searchTerm: target.value})
+    onInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        this.setState({searchTerm: event.target.value})
     }
 
     onUserSelect = (user: IUser) => {

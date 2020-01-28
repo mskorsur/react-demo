@@ -112,7 +112,7 @@ export class UserPostsContainer extends React.Component<Props, State> {
         catch(error) {
             this.props.switchMessagePopup(true);
             setTimeout(() => {            
-                window.location.reload();
+                window.location.reload();   //todo: hek to force state reset
             }, 1500);
         }
     }
