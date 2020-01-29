@@ -3,7 +3,7 @@ import Grid from '@material-ui/core/Grid';
 
 import '../../styles/user-info.css';
 import { IUser } from '../../typings';
-import { UserInformation, userDisplayMapping, IMapperProps } from '../user/index';
+import { UserInformation, userDisplayMapper, IMapperProps } from '../user/index';
 import { NEW_DISPLAY_TYPE } from '../../constants/FormDisplayType';
 
 interface Props {
@@ -30,15 +30,15 @@ export function Main (props: Props) {
     }
 
     const renderUserBody = () => {
-        return userDisplayMapping[props.formDisplayType](
-        {
+        const displayProps : IMapperProps = {
             toggleEditingUser : props.toggleUserForm,
             user : props.user,
             switchMessagePopup : props.switchMessagePopup,
-            isNew : props.formDisplayType === NEW_DISPLAY_TYPE ? true : false,
+            isNew : props.user ? true : false,
             toggleUserForm : props.toggleUserForm
-        } as IMapperProps
-        );
+        };
+
+        return userDisplayMapper[props.formDisplayType](displayProps);
     }
 
     return (
@@ -46,5 +46,5 @@ export function Main (props: Props) {
                 {renderUserInformation()}
                 {renderUserBody()}
             </Grid>
-    );    
+    );
 }

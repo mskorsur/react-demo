@@ -21,14 +21,8 @@ interface State {
 
 export class UserPostsContainer extends React.Component<Props, State> {
     state = {
-        userPosts: [],
-        postsToDelete: []
-    }
-
-    async componentDidUpdate(prevProps: Readonly<Props>) {
-        if (this.props.user && this.props.user !== prevProps.user) {
-            await this.getUserPosts();
-        }
+        userPosts: [] as IPost[],
+        postsToDelete: [] as IPost[]
     }
 
     async componentDidMount() {
@@ -36,6 +30,11 @@ export class UserPostsContainer extends React.Component<Props, State> {
             await this.getUserPosts(); 
     }
 
+    async componentDidUpdate(prevProps: Readonly<Props>) {
+        if (this.props.user && this.props.user !== prevProps.user) {
+            await this.getUserPosts();
+        }
+    }
 
     render() {
         const numOfPosts = this.state.userPosts.length;
@@ -64,11 +63,15 @@ export class UserPostsContainer extends React.Component<Props, State> {
     }
 
     renderTrashCan = (numOfPosts: number) => {
-        if(numOfPosts > 0){
-            return (<IconButton onClick={this.deleteCheckedPosts} edge="end" aria-label="delete">
-                        <DeleteIcon />
-                    </IconButton>);
+        if (numOfPosts > 0) {
+            return (
+                <IconButton onClick={this.deleteCheckedPosts} edge="end" aria-label="delete">
+                    <DeleteIcon />
+                </IconButton>
+            );
         }
+
+        return null;
     }
 
     getUserPosts = async () => {
@@ -81,22 +84,27 @@ export class UserPostsContainer extends React.Component<Props, State> {
         }
     }
 
-    removeUserPost = (postId: number) => {
-        let userPosts = this.state.userPosts.filter((post: IPost) => post.id !== postId);
+    removeUserPost = async (postId: number) => {
+        try {
+            await UserService.deleteUserPost(postId);
+        }
+        catch (error) {
+            this.props.switchMessagePopup(true);
+        }
+
+        const userPosts = this.state.userPosts.filter((post: IPost) => post.id !== postId);
         this.setState({userPosts});
     }
 
-    changePostsForDelete = (post : IPost, toDelete: boolean) => {
+    changePostsForDelete = (post: IPost) => {
         let newPostsForDelete = new Array<IPost>();
-        if(toDelete) {
+        if (this.state.userPosts.includes(post)) {
             newPostsForDelete = [...this.state.postsToDelete, post];
         }
         else {
-            newPostsForDelete = [...this.state.postsToDelete.filter((currentPost: IPost) => currentPost.id !== post.id)]
+            newPostsForDelete = this.state.postsToDelete.filter((currentPost: IPost) => currentPost.id !== post.id);
         }
-        this.setState({
-            postsToDelete: [...newPostsForDelete]
-        });
+        this.setState({ postsToDelete: newPostsForDelete });
     }
 
     deleteCheckedPosts = async () => {
@@ -111,8 +119,8 @@ export class UserPostsContainer extends React.Component<Props, State> {
         }
         catch(error) {
             this.props.switchMessagePopup(true);
-            setTimeout(() => {            
-                window.location.reload();   //todo: hek to force state reset
+            setTimeout(() => {          
+                window.location.reload();
             }, 1500);
         }
     }

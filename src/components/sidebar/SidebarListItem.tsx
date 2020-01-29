@@ -12,9 +12,7 @@ interface Props {
     selectedUserId: number
 }
 
-interface State {}
-
-export class SidebarListItem extends React.Component<Props, State> {
+export class SidebarListItem extends React.Component<Props, {}> {
     render() {
         return (
             <ListItem 

@@ -12,8 +12,8 @@ export interface IMapperProps {
     toggleUserForm: (type: string) => void;
 }
 
-export const userDisplayMapping : {[key: string]: (props: IMapperProps) => JSX.Element | null} = {
-    [NEW_DISPLAY_TYPE] : (props) => renderCreateUserForm(props),
+export const userDisplayMapper : {[key: string]: (props: IMapperProps) => JSX.Element} = {
+    [NEW_DISPLAY_TYPE] : (props) => renderUserForm(props),
     [EDIT_DISPLAY_TYPE] : (props) => renderUserForm(props),
     [DEFAULT_DISPLAY_TYPE] : (props) => renderUserPosts(props)
 };
@@ -27,17 +27,6 @@ const renderUserForm = (props: IMapperProps) => {
             isNew = {props.isNew}
        />
     );
-}
-
-const renderCreateUserForm = (props: IMapperProps) => {
-    return (
-        <UserForm 
-             toggleEditingUser = {props.toggleUserForm}
-             user = {undefined}
-             switchMessagePopup = {props.switchMessagePopup}
-             isNew = {props.isNew}
-        />
-     );
 }
 
 const renderUserPosts = (props: IMapperProps) => {

@@ -124,20 +124,20 @@ export class UserForm extends React.Component<Props, State> {
         let value = event.target.value;
         let key = event.target.name;
 
-        this.setState(
-            {[key]: value}
-        )
+        this.setState({[key]: value})
     }
 
     submitUserForm = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         let userId = this.props.user?.id ? this.props.user?.id : 0;
+
         try {
             await UserService.updateUser(userId, this.state);
         }
         catch (error) {
             this.props.switchMessagePopup(true);
         }
+        
         this.props.toggleEditingUser(DEFAULT_DISPLAY_TYPE);
     }
 

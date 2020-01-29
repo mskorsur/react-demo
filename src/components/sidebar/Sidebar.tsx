@@ -8,14 +8,13 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
 import { IUser } from '../../typings';
-import { NEW_DISPLAY_TYPE } from '../../constants/FormDisplayType';
 import { SidebarListItem } from './SidebarListItem';
 import { UserService } from '../../services/UserService';
 
 interface Props {
     classes: string;
     onUserSelect: (user: IUser) => void;
-    toggleUserForm: (type: string) => void;
+    toggleUserForm: () => void;
 }
 
 interface State {
@@ -56,7 +55,7 @@ export class Sidebar extends React.Component<Props, State> {
                     <List component="nav" aria-label="users">
                         {this.renderUsers()}
                     </List>
-                    <Button variant="contained" color="primary" onClick={() => {this.props.toggleUserForm(NEW_DISPLAY_TYPE)}} >Add user</Button>
+                    <Button variant="contained" color="primary" onClick={this.onAddUserButtonClick} >Add user</Button>
                 </Paper>
             </Grid>
         );
@@ -64,7 +63,7 @@ export class Sidebar extends React.Component<Props, State> {
 
     renderUsers = () => {
         return this.state.users.map((user: IUser) => {
-            if (user.name.toLowerCase().indexOf(this.state.searchTerm.toLowerCase()) > -1){
+            if (this.isSearchTermInUserName(user)) {
                 return (
                     <SidebarListItem
                         key = {user.id}
@@ -83,9 +82,15 @@ export class Sidebar extends React.Component<Props, State> {
     }
 
     onUserSelect = (user: IUser) => {
-        this.setState({
-            selectedUserId: user.id
-        })
+        this.setState({selectedUserId: user.id})
         this.props.onUserSelect(user);
+    }
+
+    onAddUserButtonClick = () => {
+        this.props.toggleUserForm();
+    }
+
+    isSearchTermInUserName = (user: IUser) => {
+        return user.name.toLowerCase().indexOf(this.state.searchTerm.toLowerCase()) > -1
     }
 }

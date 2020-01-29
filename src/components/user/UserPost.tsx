@@ -11,14 +11,12 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { UserService } from '../../services/UserService';
-
 interface Props {
     post: IPost,
     numOfPosts: number,
     index: number,
     removeUserPost: (postId: number) => void 
-    changePostsForDelete: (postId: IPost, toDelete: boolean) => void
+    changePostsForDelete: (postId: IPost) => void
     switchMessagePopup: (shouldDisplay: boolean) => void
 }
 
@@ -56,17 +54,11 @@ export function UserPost (props: Props) {
     }
  
     async function deleteCard () {
-        try {
-            await UserService.deleteUserPost(props.post.id);
-            props.removeUserPost(props.post.id);
-        }
-        catch(error) {
-            props.switchMessagePopup(true)
-        }
+        props.removeUserPost(props.post.id);
     }
 
     function markPostToDelete (event: ChangeEvent<HTMLInputElement>) {
-        props.changePostsForDelete(props.post, event.target.checked);
+        props.changePostsForDelete(props.post);
     }
 
 }

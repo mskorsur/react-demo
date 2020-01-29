@@ -40,7 +40,7 @@ export function UserInformation (props: Props) {
                         </Typography>
                     </div>
                     {props.formDisplayType === DEFAULT_DISPLAY_TYPE && (
-                        <IconButton aria-label="delete" onClick={() => {props.toggleUserForm(EDIT_DISPLAY_TYPE)}}>
+                        <IconButton aria-label="delete" onClick={() => {/*remove to new method*/props.toggleUserForm(EDIT_DISPLAY_TYPE)}}>
                             <EditIcon fontSize="large" />
                         </IconButton>
                     )}
