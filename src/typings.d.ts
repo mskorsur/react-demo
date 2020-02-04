@@ -1,12 +1,13 @@
 export interface IUser {
-    id: number;
+    id?: number;
     name: string;
-    username: string;
+    username?: string;
     email: string;
-    address: IUserAddress;
+    address?: IUserAddress;
     phone: string;
     website: string;
-    company: IUserCompany;
+    company?: IUserCompany;
+    shouldBeDisplayed?: boolean;
 }
 
 export interface IUserAddress {

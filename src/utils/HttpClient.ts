@@ -1,6 +1,7 @@
 export class HttpClient {
-    static async get(url: string) {
-        const response = await fetch(url, { method: 'GET' });
-        return await response.json();
+    static get(url: string): Promise<any> {
+       return fetch(url, { method: 'GET' })
+        .then(response => response.json())
+        .catch(error => {throw new Error(error)});
     }
 }

@@ -72,3 +72,23 @@
 .user-form__buttons__button {
     margin-right: 15px !important;
 }
+
+.main__buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.main__buttons__button {
+    margin-right: 15px !important;
+}
+
+
+.sidebar__wrapper {
+    /*width: 85%;
+    display: flex;
+    flex-direction: column;
+*/}
